@@ -112,10 +112,10 @@ export default function WorkoutScreen({ route }: any) {
                 workout.name.includes("Push")
                   ? "fitness"
                   : workout.name.includes("Squat")
-                  ? "barbell"
+                  ? "trending-down"
                   : workout.name.includes("Jump")
-                  ? "walk"
-                  : "body"
+                  ? "body"
+                  : "barbell"
               }
               size={45}
               color="#fff"
@@ -381,13 +381,13 @@ export default function WorkoutScreen({ route }: any) {
                 style={[styles.cancelButton, { borderColor: colors.border }]}
                 onPress={() => setShowAddWorkout(false)}
               >
-                <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.text, paddingHorizontal:12,}]}>Cancel</Text>
               </AnimatedPressable>
               <AnimatedPressable
                 style={[styles.submitButton, { backgroundColor: colors.primary }]}
                 onPress={handleAddWorkout}
               >
-                <Text style={styles.submitButtonText}>Create Workout</Text>
+                <Text style={[styles.submitButtonText, {paddingHorizontal:12,}]}>Create Workout</Text>
               </AnimatedPressable>
             </View>
           </View>

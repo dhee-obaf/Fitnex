@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,28 +25,61 @@ export default function HomeScreen({ navigation }: any) {
       id: "1",
       name: "Push Ups",
       description: "Strengthen your chest and arms.",
+      goal: "Build upper body strength with a classic bodyweight move.",
+      steps: [
+        "Start in a plank position with your hands under your shoulders.",
+        "Lower your body until your chest is just above the floor.",
+        "Push back up through your palms until your arms are straight.",
+        "Keep your core tight and maintain a straight line from head to heels.",
+      ],
+      tips: "If full push-ups are too hard, start with knee push-ups or incline push-ups on a bench.",
     },
     {
       id: "2",
       name: "Squats",
       description: "Build powerful legs and glutes.",
+      goal: "Increase lower-body strength and improve mobility.",
+      steps: [
+        "Stand with feet about shoulder-width apart.",
+        "Push your hips back and bend your knees as if sitting in a chair.",
+        "Keep your chest lifted and knees tracking over your toes.",
+        "Drive through your heels to stand back up.",
+      ],
+      tips: "Press your knees slightly outward and keep your weight in your heels to protect your knees.",
     },
     {
       id: "3",
       name: "Jump Rope",
       description: "Boost cardio and agility.",
+      goal: "Improve heart health and coordination with a fast-paced interval move.",
+      steps: [
+        "Hold the rope handles at your sides with the rope behind you.",
+        "Swing the rope over your head and jump as it passes your feet.",
+        "Land softly on the balls of your feet with knees slightly bent.",
+        "Keep your elbows close to your body and use your wrists to turn the rope.",
+      ],
+      tips: "Start with single jumps and keep the rope low to the ground for a smoother rhythm.",
     },
     {
       id: "4",
       name: "Weights",
       description: "Build strength and muscle.",
+      goal: "Use weighted resistance to grow muscle and improve functional strength.",
+      steps: [
+        "Choose a weight that challenges you but allows good form.",
+        "Use controlled reps and focus on the muscle group you're working.",
+        "Breathe out during the exertion phase and in while returning to start.",
+        "Rest 60-90 seconds between sets and keep your movements steady.",
+      ],
+      tips: "Keep your spine neutral, avoid swinging the weight, and prioritize quality reps over speed.",
     },
-    
   ]);
   const [checkinCount, setCheckinCount] = useState(0);
   const [streak, setStreak] = useState(0);
   const [steps, setSteps] = useState(4720);
   const [goal, setGoal] = useState(8000);
+  const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
+  const [showWorkoutModal, setShowWorkoutModal] = useState(false);
 
   useEffect(() => {
     const updateDailyMetrics = async () => {
@@ -169,11 +203,10 @@ export default function HomeScreen({ navigation }: any) {
         renderItem={({ item }) => (
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() =>
-              navigation.navigate("WorkoutDetail", {
-                workout: item,
-              })
-            }
+            onPress={() => {
+              setSelectedWorkout(item);
+              setShowWorkoutModal(true);
+            }}
             style={[styles.card, styles.card3D, { backgroundColor: colors.card }]}
           >
             <View style={styles.cardContent}>
@@ -183,10 +216,10 @@ export default function HomeScreen({ navigation }: any) {
                     item.name.includes("Push")
                       ? "fitness"
                       : item.name.includes("Squat")
-                      ? "barbell"
+                      ? "trending-down"
                       : item.name.includes("Jump")
-                      ? "walk"
-                      : "body"
+                      ? "body"
+                      : "barbell"
                   }
                   size={28}
                   color="#fff"
@@ -202,7 +235,34 @@ export default function HomeScreen({ navigation }: any) {
         )}
       />
 
-        {/* Profile button removed — navigation available via tab bar */}
+      <Modal
+        visible={showWorkoutModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowWorkoutModal(false)}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: "rgba(0,0,0,0.45)" }]}> 
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}> 
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{selectedWorkout?.name}</Text>
+            <Text style={[styles.modalDescription, { color: colors.text, marginBottom: 12 }]}>{selectedWorkout?.goal}</Text>
+            <Text style={[styles.modalSectionTitle, { color: colors.text }]}>How to do it</Text>
+            {selectedWorkout?.steps?.map((step: string, index: number) => (
+              <View key={index} style={styles.modalStepRow}>
+                <Text style={[styles.modalStepBullet, { color: colors.primary }]}>•</Text>
+                <Text style={[styles.modalStepText, { color: colors.text }]}>{step}</Text>
+              </View>
+            ))}
+            <Text style={[styles.modalSectionTitle, { color: colors.text, marginTop: 18 }]}>Quick tip</Text>
+            <Text style={[styles.modalTipText, { color: colors.text }]}>{selectedWorkout?.tips}</Text>
+            <TouchableOpacity
+              style={[styles.modalCloseButton, { backgroundColor: colors.primary }]}
+              onPress={() => setShowWorkoutModal(false)}
+            >
+              <Text style={styles.modalCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </ScrollView>
   );
@@ -402,5 +462,67 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "500",
     marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  modalContent: {
+    width: "100%",
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: 12,
+  },
+  modalDescription: {
+    fontSize: 14,
+    lineHeight: 22,
+    marginBottom: 20,
+  },
+  modalSectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
+  modalStepRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    marginBottom: 8,
+  },
+  modalStepBullet: {
+    fontSize: 18,
+    lineHeight: 22,
+  },
+  modalStepText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  modalTipText: {
+    fontSize: 14,
+    lineHeight: 22,
+    marginTop: 4,
+  },
+  modalCloseButton: {
+    alignSelf: "flex-end",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+  },
+  modalCloseText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 14,
   },
 });

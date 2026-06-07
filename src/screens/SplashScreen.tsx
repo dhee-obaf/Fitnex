@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
-import { useTheme, useNavigation } from "@react-navigation/native";
 import { shadows3D } from "../styles/3dStyles";
 
-export default function SplashScreen() {
-  const { colors } = useTheme();
-  const navigation = useNavigation<any>();
+const BRAND_COLOR = "#5e1a96";
+
+type SplashScreenProps = {
+  overlay?: boolean;
+};
+
+export default function SplashScreen({ overlay }: SplashScreenProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.92)).current;
 
@@ -13,7 +16,7 @@ export default function SplashScreen() {
     Animated.parallel([
       Animated.spring(scale, {
         toValue: 1,
-        useNativeDriver: true,
+        useNativeDriver: false,
         friction: 8,
         tension: 90,
       }),
@@ -23,17 +26,17 @@ export default function SplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-
-    const timer = setTimeout(() => {
-      navigation.replace("Main");
-    }, 1400);
-
-    return () => clearTimeout(timer);
-  }, [navigation, opacity, scale]);
+  }, [opacity, scale]);
 
   return (
-    <View style={[styles.screen, { backgroundColor: "#f3ebf5", pointerEvents: "none" }]}> 
-      <Animated.View style={[styles.card, { backgroundColor: colors.primary, transform: [{ scale }] }]}> 
+    <View
+      style={[
+        styles.screen,
+        overlay && styles.overlay,
+        { backgroundColor: "#f3ebf5", pointerEvents: "none" },
+      ]}
+    >
+      <Animated.View style={[styles.card, { backgroundColor: BRAND_COLOR, transform: [{ scale }] }]}> 
         <Text style={[styles.title, { color: "#fff", fontFamily: "FugazOne_400Regular"}]}>Fitnex</Text>
         <Text style={[styles.subtitle, { color: "rgba(255,255,255,0.85)" }]}>Move. Track. Improve.</Text>
       </Animated.View>
@@ -41,12 +44,21 @@ export default function SplashScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
   },
   card: {
     alignItems: "center",

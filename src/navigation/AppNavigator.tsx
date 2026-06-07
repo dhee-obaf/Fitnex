@@ -1,99 +1,42 @@
-import { useTheme } from "@react-navigation/native";
+﻿import { useTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { BlurView } from "expo-blur";
 import HomeScreen from "../screens/HomeScreen";
 import WorkoutScreen from "../screens/WorkoutScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import SplashScreen from "../screens/SplashScreen";
-import TabBar3DButton from "../components/TabBar3DButton";
 import { shadows3D } from "../styles/3dStyles";
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
 
-function HomeStack() {
-  const { colors } = useTheme();
-
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.card },
-        headerTintColor: colors.text,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen
-        name="HomeScreen"
-        component={HomeScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="WorkoutDetail"
-        component={WorkoutScreen}
-        options={({ route }) => ({
-          title: (route.params as any)?.workout?.name || "Workout",
-        })}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function WorkoutStack() {
-  const { colors } = useTheme();
-
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.card },
-        headerTintColor: colors.text,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen
-        name="WorkoutTab"
-        component={WorkoutScreen}
-        options={{ title: "Workout" }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function MainTabs() {
+export default function AppNavigator() {
   const { colors } = useTheme();
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      initialRouteName="Home"
+      screenOptions={({ route }: any) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,
         tabBarStyle: [
           {
-            backgroundColor: colors.card,
-            borderTopColor: colors.border,
-            height: 76,
-            paddingBottom: 12,
+            backgroundColor: "#ddc5e7",
+            // borderTopColor: "transparent",
+            height: 70,
+            paddingBottom: 10,
             paddingTop: 8,
             borderTopWidth: 0,
             position: "relative",
+            overflow: "hidden",
           },
           styles.tabBar3D,
         ],
-        tabBarButton: (props) => (
-          <TabBar3DButton
-            {...props}
-            focused={props.accessibilityState?.selected}
-          />
-        ),
-        tabBarIcon: ({ color, size, focused }) => {
+        tabBarIcon: ({ size, focused }) => {
           let iconName = "home";
-          if (route.name === "Workout") {
-            iconName = "barbell";
-          } else if (route.name === "Profile") {
-            iconName = "person";
-          }
+          if (route.name === "Workout") iconName = "barbell";
+          if (route.name === "Profile") iconName = "person";
           return (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
               <Ionicons
@@ -111,28 +54,19 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} options={{ title: "Home" }} />
-      <Tab.Screen name="Workout" component={WorkoutStack} options={{ title: "Workout" }} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: "Home" }} />
+      <Tab.Screen name="Workout" component={WorkoutScreen} options={{ title: "Workout" }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: "Profile" }} />
     </Tab.Navigator>
-  );
-}
-
-export default function AppNavigator() {
-  return (
-    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Main" component={MainTabs} />
-    </Stack.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   tabBar3D: {
     ...shadows3D.deep,
-    borderRadius: 24,
-    marginBottom: 12,
-    marginHorizontal: 12,
+    borderRadius: 20,
+    marginBottom: 10,
+    marginHorizontal: 10,
   },
   tabIconContainer: {
     width: 36,
